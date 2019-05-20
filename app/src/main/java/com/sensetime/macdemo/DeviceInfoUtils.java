@@ -327,4 +327,44 @@ public class DeviceInfoUtils {
         }
         return builder.toString();
     }
+
+    //得到有线网卡的MAC地址
+    public static String getWireMac(){
+        String strMacAddress = null;
+        try {
+            byte[] b = NetworkInterface.getByName("eth0")
+                    .getHardwareAddress();
+            StringBuffer buffer = new StringBuffer();
+            for (int i = 0; i < b.length; i++) {
+                if (i != 0) {
+                    buffer.append(':');
+                }
+                System.out.println("b:"+(b[i]&0xFF));
+                String str = Integer.toHexString(b[i] & 0xFF);
+                buffer.append(str.length() == 1 ? 0 + str : str);
+            }
+            strMacAddress = buffer.toString().toUpperCase();
+            Log.d("TAG",strMacAddress);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return strMacAddress;
+    }
+
+    public static String getMacAddress() {
+        String result = "";
+        String Mac = "";
+        result = callCmd("busybox ifconfig", "HWaddr");
+
+        if (result == null) {
+            return "网络出错，请检查网络";
+        }
+        if (result.length() > 0 && result.contains("HWaddr")) {
+            Mac = result.substring(result.indexOf("HWaddr") + 6, result.length() - 1);
+            if (Mac.length() > 1) {
+                result = Mac.toLowerCase();
+            }
+        }
+        return result.trim();
+    }
 }
